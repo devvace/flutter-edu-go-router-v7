@@ -8,11 +8,26 @@ import 'package:go_router_v7/screens/6_path_param_screen.dart';
 import 'package:go_router_v7/screens/7_query_parameter.dart';
 import 'package:go_router_v7/screens/8_nested_child_screen.dart';
 import 'package:go_router_v7/screens/8_nested_screen.dart';
+import 'package:go_router_v7/screens/9_login_screen.dart';
+import 'package:go_router_v7/screens/9_private_screen.dart';
 import 'package:go_router_v7/screens/root_screen.dart';
+
+// 로그인이 됐는지 안 됐는지
+// true - login OK / false - login NO
+bool authState = false;
 
 // https://knoow.tistory.com/ -> / -> path
 // https://knoow.tistory.com/flutter -> /flutter
 final router = GoRouter(
+  redirect: (context, state) {
+    // return string (path) -> 해당 라우트로 이동한다 (path)
+    // return null -> 원래 이동하려던 라우트로 이동한다.
+    if(state.location == '/login/private' && !authState) {
+      return '/login';
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -94,7 +109,33 @@ final router = GoRouter(
               ),
             ),
           ],
-        )
+        ),
+        GoRoute(
+          path: 'login',
+          builder: (_, state) => LoginScreen(),
+          routes: [
+            GoRoute(
+              path: 'private',
+              builder: (_, state) => PrivateScreen(),
+            )
+          ],
+        ),
+        GoRoute(
+          path: 'login2',
+          builder: (_, state) => LoginScreen(),
+          routes: [
+            GoRoute(
+              path: 'private',
+              builder: (_, state) => PrivateScreen(),
+              redirect: (context, state) {
+                if(!authState) {
+                  return '/login2';
+                }
+                return null;
+              }
+            )
+          ],
+        ),
       ],
     ),
   ],
